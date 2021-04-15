@@ -29,15 +29,15 @@ def insert(sqldb, sqlcur, param):
         sqldb.rollback()
 
 # 删除操作
-def delete_top_in_db():
+def delete_top_in_db(sqldb, sqlcur):
     try:
-        cur.execute("delete from title where top='题目啊'")  # 执行
+        sqlcur.execute("delete from title where top='题目啊'")  # 执行
         # 提交
-        db.commit()
+        sqldb.commit()
     except Exception as e:
         print("操作异常：%s" % str(e))
         # 错误回滚
-        db.rollback()
+        sqldb.rollback()
 
 # 向指定数据库搜索，若无则写入，若有则显示
 def find_db_and_return_result(api_str):
@@ -52,7 +52,7 @@ def find_db_and_return_result(api_str):
     if(len(find_db_result) > 0 ):
         print(find_db_result)
     else:
-        insert(db, cur, (int(time.time()), mystr['top'], mystr['body'], mystr['result']))
+        insert(db, cur, (int(time.time()), api_str['top'], api_str['body'], api_str['result']))
         print("数据库中无此题目，写入数据库!")
 
     # 关闭数据库连接
