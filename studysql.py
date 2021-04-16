@@ -2,6 +2,10 @@
 import time  
 import pymysql
 
+db = 0
+cur = 0
+top_words_list = []
+
 
 # 搜索数据库题目列
 def find_top_in_db(sqldb, sqlcur, param):
@@ -39,21 +43,39 @@ def delete_top_in_db(sqldb, sqlcur):
         # 错误回滚
         sqldb.rollback()
 
-# 向指定数据库搜索，若无则写入，若有则显示
-def find_db_and_return_result(api_str):
+
+def connect_db():
+    global db 
+    global cur
     # 打开数据库连接
     db = pymysql.connect(host='47.101.31.29', port=3306, user='tiku', passwd='tiku1708.', db='tiku')
 
     # 使用 cursor() 方法创建一个游标对象cur  查询结果以字典格式输出
     cur = db.cursor(cursor=pymysql.cursors.DictCursor)
 
+    print("连接服务器!")
+
+# 向指定数据库搜索，若无则写入，若有则显示
+def find_db_and_return_result(api_str):
+    global db 
+    global cur
+
+    #根据单词进入数据库进行查询
     find_db_result = find_top_in_db(db, cur, api_str['first_word'])
 
     if(len(find_db_result) > 0 ):
         print(find_db_result)
     else:
-        insert(db, cur, (int(time.time()), api_str['top'], api_str['body'], api_str['result']))
-        print("数据库中无此题目，写入数据库!")
+        if( api_str['first_word'] in  top_words_list ):
+            print("题目重复,放弃写入!")
+        else:
+            top_words_list.append(api_str['first_word'])
+            insert(db, cur, (int(time.time()), api_str['top'], api_str['body'], api_str['result']))
+            print("数据库无此题目,写入数据库!")
 
+
+def close_db():
+    global db 
     # 关闭数据库连接
     db.close()
+    print("断开连接服务器!")

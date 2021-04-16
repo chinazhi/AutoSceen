@@ -28,6 +28,7 @@ def get_pic_text(filePath):
     top_flag3 = '判断题'
     body_flag = 'A'
     result_flag = '正确答案'
+    footer_flag = '奖励卡'
     top_words = ''
     body_words = ''
     result_words = ''
@@ -45,6 +46,8 @@ def get_pic_text(filePath):
             words_type = 2
         elif( (result_flag in tmp) ):    
             words_type = 3
+        elif( (footer_flag in tmp)):
+            break    
 
         #保存文字到对应区域 
         if(words_type == 1):
