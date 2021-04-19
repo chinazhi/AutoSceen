@@ -18,7 +18,7 @@ def find_top_in_db(sqldb, sqlcur, param):
         return data
     except :
         print("查询失败")
-        return []
+        return 0
 
 # 插入操作
 def insert(sqldb, sqlcur, param):
@@ -61,17 +61,25 @@ def find_db_and_return_result(api_str):
     global cur
 
     #根据单词进入数据库进行查询
-    find_db_result = find_top_in_db(db, cur, api_str['first_word'])
+    try:
+        find_db_result = find_top_in_db(db, cur, api_str['first_word'])
+    except:
+        print("失败!\n")
+        return 0
+        
+    if(find_db_result == 0):
+        return 0
 
     if(len(find_db_result) > 0 ):
-        print(find_db_result)
+        print("数据库存在,放弃写入!\n")
+        #print(find_db_result)
     else:
-        if( api_str['first_word'] in  top_words_list ):
-            print("题目重复,放弃写入!")
+        if( api_str['top'] in  top_words_list ):
+            print("题目重复,放弃写入!\n")
         else:
             top_words_list.append(api_str['first_word'])
             insert(db, cur, (int(time.time()), api_str['top'], api_str['body'], api_str['result']))
-            print("数据库无此题目,写入数据库!")
+            print("数据库无此题目,写入数据库!\n")
 
 
 def close_db():
